@@ -1,16 +1,17 @@
-window.eclipse = Ember.Application.create({
+window.Eclipse = Ember.Application.create({
+
+    init: function() {
+        Ember.Enumerable.reopen({
+            sum: function(initialValue) {
+                return this.reduce(function(prev, item) {
+                    return prev + item;
+                }, typeof initialValue === "undefined" ? 0 : initialValue);
+            }
+        });
+    },
 
     ready: function() {
         this._super();
-        Ember.Enumerable.mixin({
-            sum: function(startValue) {
-                var sum = typeof startValue == "undefined" ? 0 : startValue;
-                this.forEach(function(item) {
-                    sum = sum + item;
-                });
-                return sum;
-            }
-        });
     }
 
 });

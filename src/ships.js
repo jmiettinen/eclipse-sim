@@ -1,4 +1,4 @@
-eclipse.Ship = Ember.Object.extend(Ember.Copyable, {
+Eclipse.Ship = Ember.Object.extend(Ember.Copyable, {
     cost: 0,
     initiative: 0,
     slots: 0,
@@ -9,7 +9,7 @@ eclipse.Ship = Ember.Object.extend(Ember.Copyable, {
     innateEnergy: 0,
 
     copy: function(deep) {
-        return eclipse.Ship.create({
+        return Eclipse.Ship.create({
             cost: this.get("cost"),
             initiative: this.get("initiative"),
             slots: this.get("slots"),
@@ -19,6 +19,10 @@ eclipse.Ship = Ember.Object.extend(Ember.Copyable, {
             moving: this.get("moving"),
             innateEnergy: this.get("innateEnergy")
         });
+    },
+
+    willDieOf: function(damage) {
+        return this.get("damage") + damage > this.get("totalHull");
     },
 
     isValid: function() {
@@ -45,13 +49,13 @@ eclipse.Ship = Ember.Object.extend(Ember.Copyable, {
     totalShieldBonus: function() {
         return this.get("parts").map(function(part) {
             return part.hasOwnProperty("shield") ? part.shield : 0;
-        }).sum();
+        }).reduce(function(sum, val) {return sum + val;}, 0);
     }.property("parts"),
 
     totalEnergy: function() {
-        var totalEnergy = this.get("energy") + this.get("parts").map(function(part) {
+        var totalEnergy = this.get("innateEnergy") + this.get("parts").map(function(part) {
             return part.hasOwnProperty("energy") ? part.energy : 0;
-        }).sum();
+        }).reduce(function(sum, val) {return sum + val;}, 0);
         return totalEnergy;
     }.property("parts", "energy"),
 
@@ -59,14 +63,14 @@ eclipse.Ship = Ember.Object.extend(Ember.Copyable, {
         var initiative = this.get("initiative");
         initiative += this.get("parts").map(function(part) {
             return part.hasOwnProperty("initiative") ? part.initiative : 0;
-        }).sum();
+        }).reduce(function(sum, val) {return sum + val;}, 0);
         return initiative;
     }.property("initiative", "parts"),
 
     totalHull: function() {
         var totalHull = this.get("parts").map(function(part) {
             return part.hasOwnProperty("hitPoints") ? part.hitPoints : 0;
-        }).sum();
+        }).reduce(function(sum, val) {return sum + val;}, 0);
         return totalHull;
     }.property("parts"),
 
@@ -74,18 +78,20 @@ eclipse.Ship = Ember.Object.extend(Ember.Copyable, {
         return this.get("damage") <= this.get("totalHull");
     }.property("damage", "totalHull"),
 
-    hasMissiles: function() {
-        return this.get("parts").some(function(part) { return part.missile; });
+    weapons: function() {
+        return this.get("parts").filter(function(part) { return part.hasOwnProperty("damage"); });
     }.property("parts"),
 
+    hasMissiles: function() {
+        return this.get("weapons").some(function(part) { return part.missile; });
+    }.property("weapons"),
+
     hasBeamWeapons: function() {
-        return this.get("parts").some(function(part) {
-           return part.damage && !part.missile;
-        });
-    }.property("parts")
+        return this.get("weapons").some(function(part) { return !part.missile; });
+    }.property("weapons")
 });
 
-eclipse.ships = function(parts) {
+Eclipse.ships = (function(parts) {
     var ships = [
         {name: "interceptor", cost: 3, initiative: 2, slots: 4, moving: true, parts:
             ["ion cannon", "nuclear drive", "nuclear source"]},
@@ -96,7 +102,15 @@ eclipse.ships = function(parts) {
         {name: "starbase", cost: 3, slots: 5, initiative: 4, moving: false, innateEnergy: 3, parts:
             ["hull", "hull", "electron computer", "ion cannon"]}
     ].map(function(propertyHash) {
-        return eclipse.Ship.create(propertyHash);
+        var actualParts = propertyHash.parts.map(function(partName) {
+            return parts[partName];
+        });
+        propertyHash.parts = actualParts;
+        return Eclipse.Ship.create(propertyHash);
     });
-    return ships;
-};
+    var shipsHash = {};
+    ships.forEach(function(ship) {
+        shipsHash[ship.get("name")] = ship;
+    });
+    return shipsHash;
+})(Eclipse.parts);
