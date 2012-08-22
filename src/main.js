@@ -13,5 +13,11 @@ window.Eclipse = Ember.Application.create({
     ready: function() {
         this._super();
     }
-
 });
+
+Eclipse.log = function() {
+    if (Eclipse.DEBUG && window.console && window.console.log) {
+        console.log.apply(console, arguments);
+    }
+};
+Eclipse.DEBUG = true;
