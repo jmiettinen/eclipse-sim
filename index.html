@@ -35,9 +35,10 @@
 </div>
 <script type="text/javascript">
     (function() {
+        function copyAll(arr) { return arr.map(function(s) { return s.copy(); })}
         var s = Eclipse.ships;
-        var defender = [s["dreadnought"]].map(function(s) {return s.copy();});
-        var attacker = [s["interceptor"], s["interceptor"], s["interceptor"]].map(function(s) {return s.copy();});
+        var defender = copyAll([s["dreadnought"], s["cruiser"]]);
+        var attacker = copyAll([s["interceptor"], s["interceptor"], s["interceptor"], s["cruiser"], s["cruiser"]]);
         var result = Eclipse.Simulator.simulateFight(defender, attacker);
         function fleetToText(ships) {
             var arr = [];

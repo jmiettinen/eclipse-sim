@@ -1,4 +1,4 @@
-window.Eclipse = Ember.Application.create({
+Eclipse = Ember.Application.create({
 
     init: function() {
         Ember.Enumerable.reopen({
@@ -16,7 +16,7 @@ window.Eclipse = Ember.Application.create({
 });
 
 Eclipse.log = function() {
-    if (Eclipse.DEBUG && window.console && window.console.log) {
+    if (Eclipse.DEBUG && console && console.log) {
         console.log.apply(console, arguments);
     }
 };

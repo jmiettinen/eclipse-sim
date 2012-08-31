@@ -16,7 +16,7 @@ Eclipse.parts = (function() {
         "conformal drive": {initiative: 2, move: 4, energy: -2, discovery: true},
         "gauss shield": {shield: 1},
         "phase shield": {shield: 2, energy: -1},
-        "flux shield": {shield: 3, energy: -2},
+        "flux shield": {shield: 3, energy: -2, discovery: true},
         "nuclear source": {energy: 3},
         "fusion source": {energy: 6},
         "tachyon source": {energy: 9},

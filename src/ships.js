@@ -43,7 +43,7 @@ Eclipse.Ship = Ember.Object.extend(Ember.Copyable, {
     totalAttackBonus: function() {
         return this.get("parts").map(function(part) {
             return part.hasOwnProperty("attack") ? part.attack : 0;
-        });
+        }).reduce(function(sum, val) { return sum + val;}, 0);
     }.property("parts"),
 
     totalShieldBonus: function() {
